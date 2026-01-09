@@ -1,0 +1,1523 @@
+<!doctype html>
+<html lang="zh-Hant" data-accent="mono">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cybersecurity Profile</title>
+  <meta name="description" content="資安簡約個人頁：簡歷、專案/CTF、學習歷程（按鈕分頁切換）" />
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --card:#ffffff;
+      --radius:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+
+      --ease: cubic-bezier(.2,.8,.2,1);
+      --shadow: 0 10px 30px rgba(0,0,0,.06);
+
+      /* base accent (mono) */
+      --accent-1: var(--text);
+      --accent-2: var(--text);
+      --accent-3: var(--text);
+      --accent-soft: color-mix(in srgb, var(--text) 10%, transparent);
+      --accent-border: color-mix(in srgb, var(--text) 20%, var(--line));
+      --accent-ink: var(--text);
+    }
+
+    [data-theme="dark"]{
+      --bg:#0b0f19;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#1f2937;
+      --card:#0f1626;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* 全站彩色模式：整個網站都吃這套 */
+    html[data-accent="color"]{
+      --accent-1:#7c3aed;  /* purple */
+      --accent-2:#06b6d4;  /* cyan */
+      --accent-3:#f97316;  /* orange */
+      --accent-soft: color-mix(in srgb, var(--accent-2) 18%, transparent);
+      --accent-border: color-mix(in srgb, var(--accent-2) 40%, var(--line));
+      --accent-ink: color-mix(in srgb, var(--accent-2) 75%, var(--text));
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+      transition: background-color .25s var(--ease), color .25s var(--ease);
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    a.underline{text-decoration:underline; text-underline-offset:3px}
+
+    /* 全站彩色時：整體文字/邊框更有彩色感（仍保留可讀性） */
+    html[data-accent="color"] body{
+      color: color-mix(in srgb, var(--accent-2) 32%, var(--text));
+    }
+    html[data-accent="color"] a.underline{
+      text-decoration-color: color-mix(in srgb, var(--accent-2) 55%, transparent);
+    }
+
+    header{
+      position:sticky; top:0; z-index:10;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+      transition: border-color .25s var(--ease), background-color .25s var(--ease);
+    }
+    html[data-accent="color"] header{
+      border-bottom-color: color-mix(in srgb, var(--accent-2) 30%, var(--line));
+    }
+
+    /* 彩色背景柔光 */
+    html[data-accent="color"] body::before{
+      content:"";
+      position:fixed; inset:-120px;
+      background:
+        radial-gradient(650px 280px at 10% 10%, color-mix(in srgb, var(--accent-1) 25%, transparent), transparent 60%),
+        radial-gradient(560px 260px at 90% 20%, color-mix(in srgb, var(--accent-2) 24%, transparent), transparent 60%),
+        radial-gradient(560px 280px at 40% 92%, color-mix(in srgb, var(--accent-3) 20%, transparent), transparent 70%);
+      filter: blur(18px);
+      opacity:.9;
+      pointer-events:none;
+      z-index:-2;
+      animation: floatBg 10s var(--ease) infinite alternate;
+    }
+    @keyframes floatBg{
+      from{ transform: translate3d(0,0,0) scale(1); }
+      to{ transform: translate3d(0,-18px,0) scale(1.03); }
+    }
+
+    .topbar{
+      max-width:980px; margin:0 auto; padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{display:flex; flex-direction:column; gap:2px;}
+    .brand .name{font-weight:700; font-size:14px;}
+    .brand .role{font-size:12px; color:var(--muted);}
+    html[data-accent="color"] .brand .role{
+      color: color-mix(in srgb, var(--accent-2) 40%, var(--muted));
+    }
+
+    .nav{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .btn{
+      border:1px solid var(--line);
+      background:transparent;
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px;
+      transition: transform .12s var(--ease), background-color .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease), filter .25s var(--ease);
+      user-select:none;
+      will-change: transform;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.06);}
+    .btn:active{transform: translateY(0px) scale(.98); box-shadow:none;}
+
+    html[data-accent="color"] .btn{
+      border-color: color-mix(in srgb, var(--accent-2) 28%, var(--line));
+      color: color-mix(in srgb, var(--accent-2) 24%, var(--text));
+    }
+    html[data-accent="color"] .btn:hover{
+      border-color: color-mix(in srgb, var(--accent-2) 50%, var(--line));
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-2) 14%, transparent);
+    }
+
+    .btn.primary{
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+      font-weight:700;
+    }
+    html[data-accent="color"] .btn.primary{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .btn.active{
+      background: var(--accent-soft);
+      border-color: var(--accent-border);
+    }
+    html[data-accent="color"] .btn.active{
+      background: color-mix(in srgb, var(--accent-2) 14%, transparent);
+      border-color: color-mix(in srgb, var(--accent-2) 50%, var(--line));
+    }
+
+    /* 神祕小按鈕本身：彩色時更亮 */
+    #themeBtn{position:relative; overflow:hidden;}
+    html[data-accent="color"] #themeBtn{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      border-color: transparent;
+      color: #fff;
+      filter: saturate(1.1);
+    }
+    html[data-accent="color"] #themeBtn::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(110deg, rgba(255,255,255,.0), rgba(255,255,255,.35), rgba(255,255,255,.0));
+      transform: translateX(-120%);
+      animation: shimmer 1.6s var(--ease) infinite;
+      pointer-events:none;
+    }
+
+    .wrap{max-width:980px; margin:0 auto; padding:22px 16px 64px;}
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      padding:16px;
+      box-shadow: var(--shadow);
+      transition: transform .25s var(--ease), border-color .25s var(--ease), background-color .25s var(--ease), box-shadow .25s var(--ease);
+      transform: translateY(var(--lift,0px)) perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      transform-style: preserve-3d;
+
+    }
+    html[data-accent="color"] .card{
+      border-color: color-mix(in srgb, var(--accent-2) 26%, var(--line));
+      box-shadow: 0 12px 30px color-mix(in srgb, var(--accent-2) 10%, rgba(0,0,0,.06));
+    }
+    html[data-accent="color"] .card:hover{
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--accent-2) 45%, var(--line));
+      box-shadow: 0 16px 34px color-mix(in srgb, var(--accent-2) 14%, rgba(0,0,0,.08));
+    }
+
+    .hero{
+      position:relative;
+      padding:18px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: transform .25s var(--ease), border-color .25s var(--ease), background-color .25s var(--ease), box-shadow .25s var(--ease);
+      overflow:hidden;
+      transform: perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      transform-style: preserve-3d;
+
+    }
+    html[data-accent="color"] .hero{
+      border-color: color-mix(in srgb, var(--accent-2) 30%, var(--line));
+    }
+    html[data-accent="color"] .hero::before{
+      content:"";
+      position:absolute; inset:-60px;
+      background:
+        radial-gradient(440px 240px at 15% 30%, color-mix(in srgb, var(--accent-2) 28%, transparent), transparent 65%),
+        radial-gradient(440px 240px at 85% 40%, color-mix(in srgb, var(--accent-1) 26%, transparent), transparent 65%),
+        radial-gradient(500px 240px at 55% 90%, color-mix(in srgb, var(--accent-3) 20%, transparent), transparent 70%);
+      filter: blur(16px);
+      opacity:.9;
+      animation: heroGlow 8s var(--ease) infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes heroGlow{
+      from{ transform: translateY(0) scale(1); }
+      to{ transform: translateY(-10px) scale(1.02); }
+    }
+
+    .hero h1{margin:0 0 8px; font-size:28px; position:relative; z-index:1;}
+    .hero p{margin:0; color:var(--muted); line-height:1.85; font-size:14px; position:relative; z-index:1;}
+    html[data-accent="color"] .hero p{
+      color: color-mix(in srgb, var(--accent-2) 30%, var(--muted));
+    }
+
+    .metaRow{
+      margin-top:12px;
+      display:flex; flex-wrap:wrap; gap:10px;
+      color:var(--muted);
+      font-size:13px;
+      position:relative; z-index:1;
+    }
+    html[data-accent="color"] .metaRow{
+      color: color-mix(in srgb, var(--accent-2) 30%, var(--muted));
+    }
+
+    /* name shimmer (彩色時更明顯) */
+    html[data-accent="color"] #nameBig{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip:text;
+      color: transparent;
+      background-size: 220% 100%;
+      animation: gradientShift 4.6s var(--ease) infinite;
+    }
+    @keyframes gradientShift{
+      from{ background-position: 0% 50%; }
+      to{ background-position: 100% 50%; }
+    }
+
+    .grid{display:grid; grid-template-columns: 1fr; gap:14px; margin-top:14px;}
+    .h2{margin:0 0 10px; font-size:14px; letter-spacing:.2px;}
+    html[data-accent="color"] .h2{
+      color: color-mix(in srgb, var(--accent-2) 45%, var(--text));
+    }
+    .sub{margin:-2px 0 12px; color:var(--muted); font-size:12px; line-height:1.6;}
+    html[data-accent="color"] .sub{
+      color: color-mix(in srgb, var(--accent-2) 28%, var(--muted));
+    }
+
+    .list{display:flex; flex-direction:column; gap:10px;}
+
+    .item{
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      transition: transform .25s var(--ease), border-color .25s var(--ease), background-color .25s var(--ease), box-shadow .25s var(--ease);
+      position:relative;
+      overflow:hidden;
+      transform: translateY(var(--lift,0px)) perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      transform-style: preserve-3d;
+
+    }
+    .item:hover{--lift:-1px;}
+
+    html[data-accent="color"] .item{
+      border-color: color-mix(in srgb, var(--accent-2) 24%, var(--line));
+      background: color-mix(in srgb, var(--card) 92%, color-mix(in srgb, var(--accent-2) 5%, transparent));
+    }
+    html[data-accent="color"] .item:hover{
+      border-color: color-mix(in srgb, var(--accent-2) 42%, var(--line));
+      box-shadow: 0 14px 30px color-mix(in srgb, var(--accent-2) 10%, transparent);
+    }
+
+    /* 主業（主打方向）特別動畫 */
+    .item.spotlight{
+      border-color: var(--accent-border);
+      box-shadow: 0 12px 28px color-mix(in srgb, var(--accent-2) 14%, transparent);
+    }
+    .item.spotlight::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(90deg,
+        color-mix(in srgb, var(--accent-1) 60%, transparent),
+        color-mix(in srgb, var(--accent-2) 60%, transparent),
+        color-mix(in srgb, var(--accent-3) 55%, transparent)
+      );
+      opacity:0;
+      transition: opacity .25s var(--ease);
+      pointer-events:none;
+    }
+    html[data-accent="color"] .item.spotlight::before{
+      opacity:.25;
+      animation: spotlightSweep 2.8s var(--ease) infinite;
+    }
+    @keyframes spotlightSweep{
+      0%{ transform: translateX(-30%); }
+      100%{ transform: translateX(30%); }
+    }
+    html[data-accent="color"] .item.spotlight .title{
+      background: linear-gradient(90deg, var(--accent-2), var(--accent-1), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: titlePulse 1.8s var(--ease) infinite alternate;
+    }
+    @keyframes titlePulse{
+      from{ filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+      to{ filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--accent-2) 18%, transparent)); }
+    }
+
+    .item .top{
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      align-items:baseline;
+      position:relative; z-index:1;
+    }
+    .item .title{margin:0; font-size:15px; font-weight:700;}
+    html[data-accent="color"] .item .title{
+      color: color-mix(in srgb, var(--accent-2) 36%, var(--text));
+    }
+    .item .meta{color:var(--muted); font-size:12px; font-family:var(--mono);}
+    html[data-accent="color"] .item .meta{
+      color: color-mix(in srgb, var(--accent-2) 24%, var(--muted));
+    }
+    .item .desc{margin:8px 0 0; color:var(--muted); line-height:1.75; font-size:14px; position:relative; z-index:1;}
+    html[data-accent="color"] .item .desc{
+      color: color-mix(in srgb, var(--accent-2) 22%, var(--muted));
+    }
+
+    .skills{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 680px){ .skills{grid-template-columns:1fr;} }
+    .skill{
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      transition: transform .25s var(--ease), border-color .25s var(--ease), background-color .25s var(--ease);
+      transform: translateY(var(--lift,0px)) perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      transform-style: preserve-3d;
+
+    }
+    .skill:hover{--lift:-1px;}
+    html[data-accent="color"] .skill{
+      border-color: color-mix(in srgb, var(--accent-2) 24%, var(--line));
+    }
+    html[data-accent="color"] .skill:hover{
+      border-color: color-mix(in srgb, var(--accent-2) 42%, var(--line));
+    }
+    .skill .row{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
+    .skill .k{font-size:14px; font-weight:700;}
+    html[data-accent="color"] .skill .k{
+      color: color-mix(in srgb, var(--accent-2) 38%, var(--text));
+    }
+    .skill .v{font-size:12px; color:var(--muted); font-family:var(--mono);}
+    html[data-accent="color"] .skill .v{
+      color: color-mix(in srgb, var(--accent-2) 28%, var(--muted));
+    }
+    .bar{
+      height:8px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      margin-top:10px;
+      overflow:hidden;
+      background: color-mix(in srgb, var(--bg) 70%, var(--card));
+    }
+    html[data-accent="color"] .bar{
+      border-color: color-mix(in srgb, var(--accent-2) 24%, var(--line));
+      background: color-mix(in srgb, var(--bg) 60%, color-mix(in srgb, var(--accent-2) 8%, var(--card)));
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: var(--text);
+      border-radius:999px;
+      transition: width .55s var(--ease);
+    }
+    html[data-accent="color"] .fill{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+    }
+
+    /* Projects filters */
+    .filters{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;}
+    input[type="search"]{
+      flex:1; min-width:220px;
+      border:1px solid var(--line);
+      background:transparent;
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:14px;
+      transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+    }
+    html[data-accent="color"] input[type="search"]{
+      border-color: color-mix(in srgb, var(--accent-2) 28%, var(--line));
+      color: color-mix(in srgb, var(--accent-2) 20%, var(--text));
+    }
+    input[type="search"]:focus{
+      border-color: color-mix(in srgb, var(--accent-2) 45%, var(--line));
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 12%, transparent);
+    }
+    .pill{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      color:var(--muted);
+      font-family:var(--mono);
+    }
+    html[data-accent="color"] .pill{
+      border-color: color-mix(in srgb, var(--accent-2) 26%, var(--line));
+      color: color-mix(in srgb, var(--accent-2) 28%, var(--muted));
+      background: color-mix(in srgb, var(--accent-2) 6%, transparent);
+    }
+
+    .tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+    .tag{
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+    }
+    .tag:hover{transform: translateY(-1px);}
+    html[data-accent="color"] .tag{
+      border-color: color-mix(in srgb, var(--accent-2) 24%, var(--line));
+      color: color-mix(in srgb, var(--accent-2) 22%, var(--muted));
+      background: color-mix(in srgb, var(--accent-2) 5%, transparent);
+    }
+    .tag.active{
+      color:var(--bg);
+      background:var(--text);
+      border-color:var(--text);
+    }
+    html[data-accent="color"] .tag.active{
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      border-color: transparent;
+      color:#fff;
+    }
+
+    /* Pages */
+    .page{display:none;}
+    .page.active{
+      display:block;
+      animation: pageIn .38s var(--ease) both;
+    }
+
+    /* Stagger animation targets */
+    .reveal{
+      animation: popIn .42s var(--ease) both;
+      animation-delay: var(--d, 0ms);
+      will-change: transform, opacity;
+    }
+
+    @keyframes pageIn{
+      from{opacity:0; transform: translateY(10px);}
+      to{opacity:1; transform: translateY(0);}
+    }
+    @keyframes popIn{
+      from{opacity:0; transform: translateY(10px) scale(.985);}
+      to{opacity:1; transform: translateY(0) scale(1);}
+    }
+    @keyframes shimmer{
+      0%{ transform: translateX(-120%); }
+      100%{ transform: translateX(120%); }
+    }
+
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+      opacity:.95;
+    }
+    html[data-accent="color"] footer{
+      color: color-mix(in srgb, var(--accent-2) 26%, var(--muted));
+    }
+    .mono{font-family:var(--mono);}
+
+    /* Reduced motion */
+    
+    /* =========================
+       Extra FX: 更炫但不亂
+       ========================= */
+
+    /* Canvas 粒子背景（在柔光下面） */
+    #fxCanvas{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:0;
+      opacity:.85;
+      mix-blend-mode: screen;
+      filter: saturate(1.15);
+    }
+
+    /* 游標聚光（彩色模式時更明顯） */
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:0;
+      transition: opacity .25s var(--ease);
+      background:
+        radial-gradient(360px 360px at var(--mx,50%) var(--my,30%),
+          rgba(255,255,255,.22), transparent 60%);
+      mix-blend-mode: overlay;
+    }
+    html[data-accent="color"] body.fx::after{ opacity:.80; }
+    html[data-accent="mono"] body.fx::after{ opacity:.18; }
+
+    /* Tilt glare（卡片/項目有光澤） */
+    .tiltFx{ position:relative; overflow:hidden; }
+    .tiltFx::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .2s var(--ease);
+      background:
+        radial-gradient(260px 220px at var(--px,50%) var(--py,35%),
+          rgba(255,255,255,.35), transparent 60%);
+      mix-blend-mode: overlay;
+    }
+    .tiltFx:hover::before{ opacity:.55; }
+
+    /* 彩色模式：流動邊框（很細、很乾淨） */
+    html[data-accent="color"] .fxBorder{ position:relative; }
+    html[data-accent="color"] .fxBorder::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      padding:1px;
+      border-radius: inherit;
+      background: linear-gradient(120deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      background-size: 200% 200%;
+      opacity:.35;
+      animation: borderFlow 6s var(--ease) infinite;
+      pointer-events:none;
+
+      /* border-only mask */
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    @keyframes borderFlow{
+      0%{ background-position: 0% 50%; }
+      100%{ background-position: 100% 50%; }
+    }
+
+    /* 切頁離場動畫 */
+    .page.leaving{
+      display:block;
+      animation: pageOut .22s var(--ease) both;
+    }
+    @keyframes pageOut{
+      to{opacity:0; transform: translateY(-6px);}
+    }
+
+    /* 彩色按鈕：漸層流動更炫 */
+    html[data-accent="color"] .btn.primary,
+    html[data-accent="color"] #themeBtn{
+      background-size: 240% 100%;
+      animation: gradientShiftBtn 5.2s var(--ease) infinite alternate;
+    }
+    @keyframes gradientShiftBtn{
+      from{ background-position: 0% 50%; }
+      to{ background-position: 100% 50%; }
+    }
+
+
+    /* =========================
+       Desk Pet (桌寵)
+       ========================= */
+    .deskPet{
+      position:fixed;
+      right:22px;
+      bottom:18px;
+      width:132px;
+      height:132px;
+      border-radius: 20px;
+      z-index: 9998;
+      cursor: grab;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:none;
+      transform: translateZ(0);
+      filter: drop-shadow(0 16px 30px rgba(0,0,0,.22));
+      animation: petFloat 3.6s var(--ease) infinite alternate;
+    }
+    .deskPet:active{ cursor: grabbing; }
+    .deskPet img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      border-radius: 20px;
+      border:1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.12);
+    }
+    html[data-accent="mono"] .deskPet img{
+      filter: grayscale(1) contrast(1.05);
+    }
+    html[data-accent="color"] .deskPet img{
+      filter: saturate(1.08) contrast(1.02);
+    }
+
+    .deskPet__hint{
+      position:absolute;
+      left:50%;
+      top:-10px;
+      transform: translate(-50%,-100%);
+      font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      padding:6px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      color: rgba(255,255,255,.92);
+      border:1px solid rgba(255,255,255,.18);
+      opacity:0;
+      transition: opacity .2s var(--ease), transform .2s var(--ease);
+      pointer-events:none;
+      letter-spacing:.3px;
+    }
+    .deskPet:hover .deskPet__hint{
+      opacity:1;
+      transform: translate(-50%,-105%);
+    }
+
+    .deskPet.poke{
+      animation: petPoke .42s var(--ease) 1;
+    }
+    .deskPet.snap{
+      transition: left .18s var(--ease), top .18s var(--ease);
+    }
+
+    @keyframes petFloat{
+      from{ transform: translateY(0) rotate(-.4deg); }
+      to{ transform: translateY(-10px) rotate(.6deg); }
+    }
+    @keyframes petPoke{
+      0%{ transform: translateY(0) scale(1); }
+      40%{ transform: translateY(-2px) scale(1.06); }
+      100%{ transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 520px){
+      .deskPet{ width:110px; height:110px; right:12px; bottom:10px; }
+    }
+
+@media (prefers-reduced-motion: reduce) {
+      .deskPet{ animation:none !important; }
+
+      *{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+      body::before{display:none !important;}
+    }
+  
+    /* FX layering guard */
+    body{ position:relative; }
+    header, .wrap{ position:relative; z-index:2; }
+    
+    /* FX debug badge (auto hide) */
+    #fxDebug{
+      position:fixed;
+      right:12px; bottom:12px;
+      z-index:9999;
+      font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(0,0,0,.55);
+      color: rgba(255,255,255,.92);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity .25s var(--ease), transform .25s var(--ease);
+      pointer-events:none;
+      white-space:pre;
+    }
+    body.fx #fxDebug.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+    </style>
+</head>
+
+<body>
+<canvas id="fxCanvas"></canvas>
+<div id="fxDebug" aria-hidden="true"></div>
+
+<!-- Desk Pet -->
+<div id="deskPet" class="deskPet" role="button" aria-label="desk pet" title="拖曳我｜點一下有小互動">
+  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUSExMWFRUXFRcXGBgXFxUVFxgVFxcYFxcVFxgYHSggGBolHRcVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGBAQFysdHR0rLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLSsrLS0tLTAtLSsrNy0tLf/AABEIAQMAwgMBIgACEQEDEQH/xAAcAAAABwEBAAAAAAAAAAAAAAAAAQIDBAUGBwj/xABBEAACAQIDBQYDBQYFBAMBAAABAgADEQQSIQUxQVFhBiJxgZGhEzKxQlLB0fAHFCNicuEzorLC8SRjgpJTc9I0/8QAGgEAAwEBAQEAAAAAAAAAAAAAAAECAwQFBv/EACQRAQEAAgICAgICAwAAAAAAAAABAhEDIRIxBEEiURPwMmFx/9oADAMBAAIRAxEAPwDuMj4jHUk+eoq+JF/SYisKzm71m/pubHy3DyiBggOf0+kjyy+orU/bS4jtXh13Fm8FIHq1pArdrXP+HR82JP5D3lemHA3CxkTGbSoUh/EqqvQnX0GsXf3T6TMRtjFP9sIOSgD8L+8gVKJY3d2c8yST7kylxnbXDLfIHqeWUf5tfaZ/HftAqHSmiJ43dvwA9ItY/wDRutuuDG8i9uesi4/aFCj89WmnQsL+m8zmGN7Q4qt81Z7cgcvsthKwJbX3O8+Zj3r0VdGxfbTDLomeoei5R6tb6SkxnbWq3+HTVB1u5/ATN0sK7blP0+sbr4RkPe3X3jWBHNpbTaqc1Ri5AtuA05aCRsJmqEi+UDlv9eEn0sHTK6a3G8mV2AbK/jp5xBbYfBIvDXmdT6yUicYVMR4LFVDURwLAqx5VgCFSPLTilSPBIAKa21lpV3g8xIOXQydROZBzGnsIws8EgNGp3spsQddMttb/AF8psewFW9OovJwf/Zf7Sh7M7OFQVEbitvUSb+zQ5c6f9tP8hK/jLhVu4IIJSQggggHHsT26wy3yK7nwyj1OvtKTH9v6x0REpjmbufwHtMZY8W8pIpYBzqKZ8W0/1a+gmW6vpLxvaLEVfmrOw5A5V9FsJVPWOuktU2UT8zgdFF/c/lJFPZ1McM39Wvtuhou2ZvUc2FyP5QfqJOw2xqnGy+J19BNEo4DSC0D0q6WyFHzMW8O6PzkqnhlX5VA68fWSisLLAGGEbqUgRY7pKyxJSIKGthmpHMuq8RKus4z5huvf13zYmnM9tzZ4UgroGv6yomrPDagGSkWQdkNdBLNFiMarHlSBFj6CBiRI+EhoscUQAlWStiJn7nEsP/zGVEndnsSlKvmqaKNSbE2trew19I4K1+yUyYll5gSN2SOTHVU61U9GzD6SLitpu1cPRULuF6l9b/dQak+JEb2NiSNpAMe+KlqmgALVad9LG3ESkumQQQSiCCCCAedqVNF+VVXwFv8AmGTDyw8sxWRaKAhhY4FgCAsPLHMkUqQM1lgySQEgywJFKQZJJ+HCyxhGKSBtvD3pE8u9+f4y3KRFWjdSp4gj1gKzWwm+ZZfIszezDkq2PVT4gzUU1jKDVZIRYlUj9MQMaiLtCtFWgBqIKIHxVzC6ta43XG46iHTElbYwWSlh6vNnv7Zfo0IK1W2cItN6RUBVBEzWza5/f2rcGq028gxH0tNZtw58NTqcSqnztrMxiMKaa0ag3v8AE1/pK2/GVUutwRNNrgHmAfWKlEEEEEA8/KkGSPhIeSYrMhYtVjmSGiRgQWGqxwLFhYA0qQ8kdyxWSAMZYWWP5Jm9vbf+GTSpWzDRm+6eQ5n6RybK1eFYWWc3q1WY5ixJ5kkn1kvDbcr0yLVCRybvD3195XinyT9sUvh4gnmQ3rv/ABmjw2oBmY2jtJMQFa2VxcEcDyYHlv8AWX2xKuamIjWaLHVEbWLBgZeWLAiA0cQxAqgLmafthhbYBNwKNTPmQUPu0pdk0M1VBzYenGa/tPTJwVYixyrn1FxZCGbT+kGViVR8G3xNnoeQYehMgbcT/pMO33amX/2RvxEf7FVviYJ1sRlc2vyIH9xEbQF8C/8A26iN6OB9DGG22NUzUKTc6af6RJkp+yVXNhKXQMPRiJcRkEEEEA4aFgyR0LFZZk0M5YAseCwisCJWOgRCCOIIAAIYEOGIEg7XxPwqL1Puqbf1HRfcicwzE6k3J3+M3XbutbDhR9qoAfAAn6gTAK0vFORxiOMYNS+4TWdkeyv73mapcL8Nin9Vyqk87kN6dZEXYhCs9rgG1uZGpAi84f8AHdbZ6nn329N813ZXFhgw5Hdy6TPOgAv4yXsGvlxA4Z1sfEWsfqI6XpuA0NWjKNHM0lZwGOI8ZvFUzrANP2Xp3q35AnzOk2bUwyFDuZSp8CLTNdkKPdZuZA9P+Zp0Mqek1if2eYnKldXsoCqSSdLi4P8AqEiYjbeanXpoL0jctUNwoUanLbfukXAbH+PiqtAtlVatQnfqAxFrceB15SVtnDijTrUVv3lCi+ptvP0k2m2n7P6xbC25VGHkQG/GaVTMZ+zKtelUU6WKG39S2/2zYxykXmhRN4I9jTjoWERHAIdpKjQEBEctEMYAkQ80bLwogdDQxEKYqvWVVLMwVQLknQCBMj+0OsLUU43ZvIAD8T6TG0qRchBvZgo8zLTtVtQYitnW+VVCrfS4Fze3C5J9pD2LihTxFKoVzKjhyNxIXWX9Jmt9uz7Hwf7tRVTpZRcjoLSmrYNQmVWFgzNY6G7KRrfxGknntXhqqXp4lKRtqtVCSD4XF/ImZZ8YKtVU+NRLNe7X+Em/TVjrp1nJMcvt2+WP0p62ymLMeGvqQBp/mlfUwLtiEVN9mO+1gLXPvLvauOCOabVEKg6lCGBHSxlZg9or+8BlYD+HlXu2BJa7Wv4LNcbZ3WHJpZDZVXhUY+DfmIGwjrvqVF8xLilh6rLqwQncctz566RhezdZ2sjCox53B8TvmuGsmV69RWmi/Cu/tEYf4pZl/eStjYXtr6mWe2thYnCLmegTpfPcMijwU38zYeMp6eJzmzkKTuOhpg8M6G4A6i1t9jN8eHym5Ueboextl7RWkpp4xACLgNSvv63kmi21TWNEYqiWCB7mnYEE2+s5yuJqopelUqUihy1FV2AQ7g2h+Um4tuBH8wE03YftY1TFr8dg38JkFQ2HEMAx0HPWGXDqb2Jl2sKSYunjWXNT/eG+1buEsAd1uR5b4jbGz9oNWUVDSLMQAFNr+eWWe3MQv7/QrKwIIp3IIOqub7ulpo9tU7V6TdZz2NIg/s2ZleqjgB8ozAbsyMVNums3pmC7Mvl2jWXn8X3ZXm6LSoCssEbzQR9E5MBAzxJgyyTJZyYhxHLQGIGCkUgiyJA2ztIYekanHco5sdw8OPlFINmNu7cp4cWPecjRQfdjwEwu1dr1a577aDco0UeXE9TIteszsXY3Zjck8TGWM0k0jZuoYKL6j0/XpEF4hTGSfnG8mw4kC9hxNuPhLDbuyHoYupgwTVdKgpqVU3cmxQqoJ1YMptc75W06DNkW6j4gFizBVsSVJLNooDBgSd1jOsbYwSo61xVSjVxdCghxmYOM5oJS+HgQO8SxUF65tlVtLExK05JXw1QGoGUg0japf7LZ8mU9c2luh5GRCZpu2lckqSAtSqFq4kAr/wD0hfhlSButZ3seNduUyqwDpfYXbBroUqG707aneyHcSeJB09J1jZeEXC0gSAazi+vDTW/tp5cJ5n2bjWpVA6MykcVNjb9AT0zTwIxGHpYjDVWqZqQIDsTmBF73b5WvfQm1xbTeMubynHfD/I5VXjqxuSxux33/AFunJ+0eDSnXYIQVJuqLqV0BK24C97dLTR9p9q13qHC4dHFQG1RtzJ/IDwbm24bhzkjYHZtKH8Wob1N4+0qk7ybEZj7TD4m/jbyyy7v1/fsvG5/Sm2V2dfEEVK/dSwGXczgfe3chqdTbzmsTs9hrAfBp2HJf7SUahXVgbb779P6RrbcBzuJLwyMVBdQpO8A3t0vxk58+du9t/wCKSdxRbYw4prRVRZEZgFAAAzEMdw1uQTrJT9oqmdqtVlZUIygpqTy0O+H2lYCmLkAhgQDe50Og6/lKNaQBapUNlBJUcBfeR14X6TTG5ZTe0WTa/wCy20nfHLUcWLs2lrWBRgF3m9gALzpnxROLdm9pZ8dTuAFVqWXnZnIN/adlqrebxJ7NBI9v1eCUHL4YhCC8QGWiLwRDNECiZhO3GMLVVp30QX/8m/tb1m1dtJzntMf+pqeI/wBCx4xNVpjVQmOyM7S0kO2vj9YAYljEq0Rr8YpamzzTJtVw9b4lPfrRr5UrJ0tUFFtfvtbjKevjXfLnYtlUItyTlRflVb/Ko5CHTq2V1+8oHoyt9VEjQNIDlkck3IdXJJuTmzKxJO/vFPWRpOwOHLJVbgKba9VZHt7AeLCJGzappGuFvTBsxG9dAcxG/Kb74BFE3f7Pv2g1sAGolv4L3tmBcUnP2woIJHEgehmDBigYrCd82bhUSmXRvil71C9wzVWbXNmuAb358Y/i17oOYLbU3APh82gnKuw3aZqLDDsf4bnu3PyOeXRjw5nqZtGrJmJ3k3uSTuIsRa9rETh5OPV/J0YZfcSTjVY2FarXItamAoU2NwCQu649pK2lt4UgAAWqEfLocvPMd2h0v6Xmfr7WyH4VFBu1toBppe2pPTlxErMRj1o3Z7tUOoF/foN46cI8eOUZclq1xOLIvVrsSxBsOAB4KOf6PKVRxBe1724Dh4+MqjjzUOZ9/sOgk3D1lm8kiFtsunkqpV4Zhr1Rg34+87i3hOGvhytOnUA7rMQTfTdpYeU7bgaoamrg/Mqn1AM0lLRyCHbpBK2NOUF4PiSnp7Zpn7VvG4klcSDqDeFliZYm/EiWeRfiyJiNogaDU+gHiZIS61e28zC9pmBrZhxUG/UXGnoJrsDhjVUPVDC50X5bLwNuZ6yl7dYcKaBA0yuvpYj6tKkpVlc8ZeOGNPKSYaFeG4hCI0rBMucZ/lN1JtfLmUqHsNTlJDW6Sxw606dIisBmp1iwXQ5w6LqODqcgsb5db6jRqVJKSstgtRSy8CpAdNdct9COOU8dxW5JBF7jcdRelXsTUqCmpLWyq4+Phhmcb8xUIpAt3lc63Blau361yQVANhlCgLYCwFvDSOrstlw9aujB6TUVAbRXUnE0hapTuSuqPY6qbGxJBAq8LbUEXupA1tY8DFZKexYixN1GW/2RuB6dOnCNqsc+HDprGQ6azZDblN1OUkHdqN3MmZACP4Nt46ycsJl7OZWNFjNorSW1M5nP2tT4ykNUs12NyecNqlpBxAIOZTbhztyteLwOZLWkZY4QXIEhYbCVcitUpMga9iylc1uIBl7sjZ2oY8NwmWS4vtri2HAH2Sv5fjNZ2f2nVFFO+SMi2BANhYaTJ7SwzPTNNWzA5Te1jcWaw8xaWWw8Q1NESoBoLb9b8uszu5GkjWnab8h6QSuGJHKCG8hpygYQW3mJShiFN0QsP5bj2P5zV4fAqmqi55mxPlwEm0MOW3Am/wCt03wy5Jfyu3P4Rkb1mHeR16ZSPU8fCM5yp04H3HSdGo7Aci7WUSs2t2dw7A/9RTV7GxDLoeoB1lXjuR7kUGA2wD8xs3WRu1AFTD/zIwf0Fm9ifQSsxWEZWKuBcG1xqjdVbiIlqBZSutypA38RC5XHqwal9M8wjbiOsLRDCaIRagiBHqojNojGI4jDKwO+4I5cc1/b0jQEepLALXYFeozDDlv4bpUp2sv20coCbXIFRg4BNg2o1kBFFtPWTsCfhqaxNj3kp8y5WzN4IGBv94oOdoJt5cvzjBVtIhRDz33f2EK0CKMRSax8YsXjLRGks8OmGJGX5rjLw719N/W0YQx1TANg2HxQq01xFRDZM2VbDvE5DcADMbIO9u00l9hlmY7OUDrUZ2ctxYk2A3Lc6mbDBU+e6c3Je22PpYYOlpLGmsj0XEmUxM1k5D+rQR3LBAM1S2lh0UM9QMSBoupF2CgtyUm+sd2f2yL1XoUcOtEi9ixzv3TZrjcD6znNCo+UJwCsu77LEMVN+FxceJllsivkrU6rEnvjMSdcp0YnyJnucXw7Lbl24M+W2dN5jaFWspzuzneATpmHeHd3co5T2epAI3EA+RFxJi1ACi8WFx/5G5Pkt/SVB2oFpJb7dSqw/wDrVyqeXdXyWb/ji5t3KDx+zVKm9r6acNTYD3mUwOJSnUYECwa1xqBcnT2tpxmu2ThXrrcG2mYnMoJJvcDW+gNufLdM5tXZRNQ0aS3drWVRoqBrljyBIGp367p5/wAzPDKe3T8fHOVn+2uHprVV6dgKiZiotcNcgsfH8DM206H217LJRwqVi/8AEUKhHBrknTw7058yzm47vFvlOzLHlGSI83KLCCWlHAkrC0GdlRBdmNgN2vUncBvJOgAJjZpS1wXw0pkZ7O62qNY92mdTSQb2Y2GZt1hlFwSWKZnFUjUcJS7yIoRTawYC5apruDOXbX7wHCR62DZNGtfkDcy4r7Sp01y0RqeJ+p5mU5BY5iSTzk7p6LGGsNSR6XPgPzhfu5O69+A3+XjNT2V7H1MVaoxNOl97ezf0g/U+82rbKwWDyKtLNVqEKmbvsWOm9tF8rTO8mq2x4bZtmqHYNFpA1nf4hF+4VsvSxBzeMw22MEaNVkvextfdpvBtO1qanx0SooFOnTJd789wvxa49AZznttgs9fPTUhXGnWxIzeekWOd32rk45MemOQ2jymNPTKkgixGhi0M2czUdmMRoyngQR56H6e81mGxQmE7Ot/F8VN/Y/hNXT3zDknbbC9NLhKl5dUBpKfY9C4B+su1FuH68ZkscEXaCGg42oA84h6wN9bAb/1zkKpiL6DU7oT0nNs3dUa2uL35nrPp7yb9PM8f22uP28KaFqh/jVEVFRdWSnYBj0LagdCTxEzFXadVnDkimq6KgAbugmym/jILuv5k7yeZO8zU9nOw1bED4lYmlTt3QR32PAkbwvuem+cfLy4cfed20w47fTcdlu3Qq4Q01prQZe7UqbqQuPnuTcsfuXJv01lj2ffDPTZsNU+J3v4jm/xC/EvcA+HC27ScO2q+JoVXw9XushtlGiKDremBwYG+bedLmSNgbcr4Wqtam24WZb91k4qQPrvE8zl4rybsdOOcx6dX7e4NamFyt/8AIhzfcUHvuOoTPpOI4kDMSBYXJC3vYcFvxtznY+1e1VxGyjXphlDGncEWIuwuvgQRruIPIzj+ITWL481jocl7RxFExJQxNjN0FwA6xs3gU8v+egiBwN6xVE6Rkcef5yVSwhtvEWxp13sPjgcHRudQCv8A6sQPYCXtc0agC1VVgGDC+lmU3BuJynY+0zSpinY6X3Hmb8podmMa1yzFUBFxvZgd+UbvWceWN8rXfhyTUjVbRdSt3GVCe5THz1W3A88vuekqMTs/MLOAapOZrWIpLay0l+p/4kg4cNVareoSRpmZRl4G2Qe2kmYakFW2/r+vTyj9FnlK5z242CUArqNNFfp91vw9JjgZ1P8AaPWAwls1i1RbD7wFyR4aX8hOUidHHenHn7W2xcQEqgk2BBBJ0A0v+Amyw+pE54rTWbC2qgCCobEW1sbEDlbyi5Md9w8Lp03Y1Oyy1WU2yNtYZ7IlamWt8t7N6NYy3bXT1/KYWNpQJTpCjghxG4cirTGm/ieMjVCzkKtyxNgALknwlpV7P4k2/hMb7tw/HSb7sb2TWh33AasRqeCjkv5z1/k/Nxxx1g4sOK29onYnsYKZFbEANV3qh1VOvVvp14b34Ntdf1zh/Cy7t306jpJFPrv+o/CeHnncruuyYyTpk+2nZEY5A1OyYimLKxvlZd5pvYE23kHUg9CZG7Mfs7oUMr18terfUH/Dp2B1CH5mvl1fxyqRNoNTbcRw5deolbtPbVHDgs7qnPMd/wDSBqT4SsebOY+MTZjLuonbLDq2DrId+QsvUoQ/mbjjrOG1U1m32/tupjDbVKIPynR6nVvur/Lx4zIYjLc5SCASAR0nV8fGydss7tENONmnaPkxh2m6DKr3x4yeaQ5DxtIdBbuPG/oJaATPKtMfRlUjqU5Io4UnWKFOxme1BhqVyBNds8BVEzOGOU3llTxfGTTjT068dGJmfoYu8lI5k6Ure3+FqVaC1EUsKb98AXIDLo1uWlvOc3HlOvUK9RGzIeFiCLgjqI5XSnU1qYSgx5kX/wBs1xzkjO47rklGnzk+nVsBp+t/1m/o7Eps1hSpKOS0k/EEy8TsngmUCphwTzpu9JvY5f8ALK/khXCuP4g6g7xbx1mp7F7axNOslIszU2JGRiTYBSSRfVbWv5GbRf2fbNBvbGHp8WiB6hQZYYHs7Qo5hRpCkGFnYu9Wq68VNRvkU21CgX5wyzx0eON2tKZuAeYB9YI6BCnM1QqeEL/NoR7/AJS2wqW7u48P7xWCpWAvvtv59PGOVd/15iYUQ8Bw4/r3jdWyi53cOd+kTUxaqL3Xu7ySFVRzLHQfrfOf9pO0r4smhhj3L2qVtQG/kT+XnxPHSGONypXLXUWHaTtlZvg0FFSqLjTVFO45iPn8AbC2pO6Y7FJlzV8TUzOd7NuHRfwt5ReMxVHBU7fM54fabr/KvtMJtfab12u50G5RuXw/OdvHxyMr/tJ2xt1qt1S60/dvHkOkZ2c+hXhv8D+vpK4pJ+Cp21E29J9lVCY0TJNZYwRGk2j2IPKbPYeyTWUVDoh48T0Exbibb9nG0SS+GY6WNROmtnHuD6zPOdbXh7WmKwYAsBYCUuIpWM1m0gFBJmUxFTMbzGNaZAkrD0SYmhSuZpdl7OvaFoNYDZ5tLSjszl6cJcYbCgAd31t+ElinJ2pTpgelj+t0cGB6S3NMGAJYdPf14xBDw+DC68ZKp0+J3xa66+3EeIjirAEhYdouC0ARaCLggDmHrh1Gc5TxP83AjxlD2k7SphgR81Ui3w72J5NVIHcHTeeXGZvG9pa+IbJhlamunfNvikcbcKSnzJjeGwFKjerVcMwuxZjcA8TrvbqdYseL9s7bTX7rXxZFTFOQmlqa9wW6KPkH+brKvb3aRKA+DhwpYaX+wnT+Zum76RravaR6rZKQK09QWsbsP9o9/pMxj6Wt5vjqdC46Ra9RnJdyWJNyTqY38EjXmZLpU4o4c8PQ7v7S9p0jClffHKaFeNx7iK3b9D7eUeo4dnIVQSSbAAXJPICGwXVW4B5yG6zqGzewobDEVDaoV7vJG4X58jOd7QwbU3am62ZSQR1H1HG8rHKVOWOldLbshiPh4yi24Z8p/wDMFfxEqzDpuVIdd6kMPEG4+kL6Ke3SO0NckyiEm7RxIchlIIIvca75CWYabJ+y6WZhOgbKwuVQZm+zWCvYmbWklhaRVQQWKAiwsMCIybQl114cOvWHlubcBv6nl4frnHQIARUHfEG436jmBr5j8o8Fh2gDQNxcajmIdob0uI0PPgfEcfrEl7fMLdfsnz4efvABaCLhQNz/ABOLo4ZMoPet8o+didxJ4DqZidt4lnPeOg3LwuBq7W3nS0nMpLBmN2bvknfbdTHpc+cqqQ+I5Y/Lbced91/K/nNds4d1sCRbTdykLFAndzk6u1hI1BLm8WJ0VKnuj6044qSdgcE1Rgqi5P61j2lHwmzTVYIFvc7uZnTOyvZZMMM5ANTnvy9Bf6yV2c2CtBbnVzvP4DpL5VkXJchpqdtRu4j8RMV+0bs78Sn+9Ux30HfA+1T5+K/S/ITe2jTrbXhxH4wl1dizbzXiF1jWaaLtth1TG11pqFQNoBoB3Rew5Xv6zOVROqXbnvVO0sSyG6k+HDzE0uya/wARVbceI5GZnL3fWaPZNGyL1sfXX9eEjknSsHT+zlDug8BNCFlb2colaK33kS2CzmbkAQjfcPM8v7xy0UqWgZKraHaKywwIAkCHaHaCIiYLRVoLRmZ+AvL3MEetBAacWxf+LU/qt5DQSABYC3L8oIJeSIh4mO0BpBBHPRX2k0hN72IoLlLWF+cOCKnG0pRwQ4JCh8Ikw4IByn9q+ERa1N1WzOveOuttBpunOKo71usEE6sPTny9l1Ru85sNjLc0gf5B9BBBFyelYOx0kAAAFgBHgIIJzNhJ+J9jDhwQMDDhQQAGAQQRAIDBBGVFDgggT//Z" alt="desk pet" draggable="false" />
+  <div class="deskPet__hint" aria-hidden="true">drag</div>
+</div>
+
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="name" id="topName">raining的B10g</div>
+      <div class="role" id="topRole">資安學習者 / 競賽向</div>
+    </div>
+
+    <div class="nav">
+      <button class="btn tabBtn active" data-page="home">總覽</button>
+      <button class="btn tabBtn" data-page="resume">沒東西的經歷</button>
+      <button class="btn tabBtn" data-page="projects">筆記/CTF</button>
+      <button class="btn tabBtn" data-page="timeline">學習歷程</button>
+
+      <button class="btn" id="themeBtn" title="點我整站變彩色">神祕小按鈕</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <section class="hero">
+      <h1><span id="nameBig">raining的B10g</span> <span class="mono" style="font-size:14px; color:var(--muted);" id="handleBig">@handle</span></h1>
+      <p id="aboutText">不知道放什麼</p>
+      <div class="metaRow" id="metaRow"></div>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <div class="h2">快速摘要</div>
+        <div class="sub">什麼都不會</div>
+        <div class="list" id="summaryList"></div>
+      </section>
+
+      <section class="card">
+        <div class="h2">技能</div>
+        <div class="skills" id="skillsPreview"></div>
+      </section>
+    </section>
+  </section>
+
+  <!-- RESUME -->
+  <section class="page" id="page-resume">
+    <section class="card">
+      <div class="h2">沒東西的經歷</div>
+
+      <div class="list" id="resumeList"></div>
+    </section>
+
+    <section class="card" style="margin-top:14px;">
+      <div class="h2">技能</div>
+      <div class="sub">用「你能做什麼」描述，百分比只是自評</div>
+      <div class="skills" id="skillsGrid"></div>
+    </section>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="page" id="page-projects">
+    <section class="card">
+      <div class="h2">筆記 / CTF</div>
+      <div class="sub">一些筆記</div>
+
+      <div class="filters">
+        <input id="q" type="search" placeholder="搜尋" />
+        <span class="pill" id="countPill">0 items</span>
+      </div>
+      <div class="tags" id="tagBar"></div>
+      <div class="list" id="projectList"></div>
+    </section>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="page" id="page-timeline">
+    <section class="card">
+      <div class="h2">學習歷程</div>
+      <div class="sub">啊哈</div>
+      <div class="list" id="timelineList"></div>
+    </section>
+
+    <section class="card" style="margin-top:14px;">
+      <div class="sub">GitHub、筆記）</div>
+      <div class="list" id="linkList"></div>
+    </section>
+  </section>
+
+  <footer>
+    <div>© <span id="year"></span> <span id="footerName">你的名字</span></div>
+  </footer>
+</main>
+
+<script>
+/** =========================
+ *  改這裡：你的資料（不要動）
+ * ========================= */
+const PROFILE = {
+  name: "raining",
+  handle: "@rainging",
+  role: "資安大廢物",
+  about: "持雲軒太強嘞",
+  meta: [
+
+
+  ],
+  resumePdfUrl: "", // 例："resume.pdf" 或 "https://.../resume.pdf"
+
+  summary: [
+    { title: "主打方向", meta: "Web Security / CTF", desc: "偏好炸電腦，正在與reverse戰鬥" },
+
+  ],
+
+  resume: [
+
+    { title: "資安相關經歷", meta: "CTF ", desc: "空氣" }
+  ],
+
+  skills: [
+    { name: "Web Security", level: 0 },
+    { name: "CTF（Web/Reverse）", level: 0 },
+    { name: "Linux ", level: 0 },
+    { name: "Python", level: 0 },
+    { name: "Burp Suite / Proxy", level: 0 },
+
+  ],
+
+  projects: [
+    { title: "linux筆記", meta: "2026-01 • 筆記", tags: ["筆記","linux"], desc: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/BJnbfx3nex", links:[{label:"筆記", url:""}] },
+    { title: "reverse筆記", meta: "2026-01 • 筆記", tags: ["筆記","reverse"], desc: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/BJnbfx3nex", links:[{label:"筆記", url:""}] },
+    { title: "web筆記", meta: "2026-01 • 筆記", tags: ["筆記","web"], desc: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/BJnbfx3nex", links:[{label:"筆記", url:""}] },
+  ],
+
+  timeline: [
+    { title: "asis/Fhctf", meta: "2025-11 → 2026-1", desc: "打了兩場比賽學到很多，大多是通靈" },
+
+  ],
+
+  links: [
+  {
+    title: "GitHub",
+    meta: "Code & tools",
+    desc: "放程式碼 / 小工具 / 解題腳本（把 url 改成你的 GitHub 個人頁）",
+    url: "https://github.com/"
+  },
+  {
+    title: "筆記（HackMD）",
+    meta: "Learning log",
+    desc: "一些資安筆記",
+    url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/HJOOqBmlZl"
+  },
+  {
+    title: "Instagram",
+    meta: "Profile",
+    desc: "@416_ctn",
+    url: "https://instagram.com/416_ctn"
+  },
+
+]
+
+};
+
+/** =========================
+ *  Render
+ * ========================= */
+const $ = (s) => document.querySelector(s);
+document.title = `${PROFILE.name} · Cybersecurity`;
+$("#topName").textContent = PROFILE.name;
+$("#topRole").textContent = PROFILE.role;
+$("#nameBig").textContent = PROFILE.name;
+$("#handleBig").textContent = PROFILE.handle || "";
+$("#aboutText").textContent = PROFILE.about;
+$("#footerName").textContent = PROFILE.name;
+$("#year").textContent = new Date().getFullYear();
+
+$("#metaRow").innerHTML = PROFILE.meta.map(m => {
+  const v = escapeHtml(m.v);
+  const k = escapeHtml(m.k);
+  const link = m.url
+    ? `<a class="underline" href="${escapeAttr(m.url)}" target="${m.url.startsWith("mailto:") ? "_self" : "_blank"}" rel="noopener">${v}</a>`
+    : v;
+  return `<span><strong>${k}:</strong> ${link}</span>`;
+}).join("");
+
+$("#summaryList").innerHTML = PROFILE.summary.map(x => itemHTML(x.title, x.meta, x.desc)).join("");
+$("#resumeList").innerHTML = PROFILE.resume.map(x => itemHTML(x.title, x.meta, x.desc)).join("");
+
+$("#skillsGrid").innerHTML = renderSkills(PROFILE.skills);
+$("#skillsPreview").innerHTML = renderSkills(PROFILE.skills.slice(0,4));
+
+markSpotlight();
+
+/** Projects search & tags */
+const q = $("#q");
+const tagBar = $("#tagBar");
+const projectList = $("#projectList");
+const countPill = $("#countPill");
+let activeTag = "全部";
+
+function allTags(){
+  const tags = PROFILE.projects.flatMap(p => p.tags || []);
+  return ["全部", ...[...new Set(tags)].sort((a,b)=>a.localeCompare(b,"zh-Hant"))];
+}
+function renderTags(){
+  tagBar.innerHTML = "";
+  allTags().forEach(t => {
+    const el = document.createElement("div");
+    el.className = "tag" + (t===activeTag ? " active" : "");
+    el.textContent = t;
+    el.onclick = () => { activeTag = t; renderProjects(); renderTags(); };
+    tagBar.appendChild(el);
+  });
+}
+function matchProject(p){
+  const keyword = q.value.trim().toLowerCase();
+  const matchTag = (activeTag === "全部") ? true : (p.tags||[]).includes(activeTag);
+  if(!matchTag) return false;
+  if(!keyword) return true;
+  const hay = (p.title + " " + p.desc + " " + (p.tags||[]).join(" ") + " " + p.meta).toLowerCase();
+  return hay.includes(keyword);
+}
+function renderProjects(){
+  const items = PROFILE.projects.slice().filter(matchProject);
+  countPill.textContent = `${items.length} items`;
+
+  projectList.innerHTML = items.length ? items.map(p => {
+    const links = (p.links||[]).filter(x=>x.url).map(x =>
+      `<a class="btn" href="${escapeAttr(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.label)}</a>`
+    ).join(" ");
+
+    return `
+      <div class="item">
+        <div class="top">
+          <h3 class="title">${escapeHtml(p.title)}</h3>
+          <div class="meta">${escapeHtml(p.meta)}</div>
+        </div>
+        <div class="desc">${escapeHtml(p.desc)}</div>
+        ${links ? `<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">${links}</div>` : ""}
+      </div>
+    `;
+  }).join("") : `<div class="item"><div class="desc">找不到項目，換個關鍵字或標籤試試。</div></div>`;
+
+  const page = $("#page-projects");
+  applyReveal(page);
+}
+q.addEventListener("input", renderProjects);
+renderTags();
+renderProjects();
+
+/** Timeline & Links */
+$("#timelineList").innerHTML = PROFILE.timeline.map(t => itemHTML(t.title, t.meta, t.desc)).join("");
+$("#linkList").innerHTML = PROFILE.links.map(l => {
+  const urlPart = l.url
+    ? `<a class="btn" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">開啟</a>`
+    : `<span class="pill">未填</span>`;
+  return `
+    <div class="item">
+      <div class="top">
+        <h3 class="title">${escapeHtml(l.title)}</h3>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div class="meta">${escapeHtml(l.meta || "")}</div>
+          ${urlPart}
+        </div>
+      </div>
+      <div class="desc">${escapeHtml(l.desc || "")}</div>
+    </div>
+  `;
+}).join("");
+
+/** 神祕小按鈕：整站切換彩色模式 */
+function getAccent(){
+    const KEY = "accent";
+    const MIG = "accent_migrated_v3_default_mono";
+    // 一次性重置：如果你之前版本把 accent 記成 color，打開新版會自動回到黑白。
+    if(!localStorage.getItem(MIG)){
+      localStorage.setItem(KEY, "mono");
+      localStorage.setItem(MIG, "1");
+    }
+    return localStorage.getItem(KEY) || "mono";
+  }
+function setAccent(a){
+  document.documentElement.setAttribute("data-accent", a === "color" ? "color" : "mono");
+  localStorage.setItem("accent", a);
+}
+$("#themeBtn").addEventListener("click", ()=>{
+  setAccent(getAccent() === "mono" ? "color" : "mono");
+  const active = document.querySelector(".page.active");
+  if(active){
+    applyReveal(active);
+    animateSkills(active);
+  }
+});
+setAccent(getAccent());
+
+/** Tabs */
+const tabBtns = document.querySelectorAll(".tabBtn");
+tabBtns.forEach(b => b.addEventListener("click", ()=> showPage(b.dataset.page)));
+
+function showPage(key){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const target = document.querySelector(`#page-${key}`);
+  if(target) target.classList.add("active");
+
+  tabBtns.forEach(b => b.classList.toggle("active", b.dataset.page === key));
+  location.hash = key;
+
+  if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    window.scrollTo({top: 0, behavior: "smooth"});
+  } else {
+    window.scrollTo({top: 0});
+  }
+
+  if(target){
+    applyReveal(target);
+    animateSkills(target);
+  }
+}
+
+const initial = (location.hash || "#home").replace("#","").trim();
+if(["home","resume","projects","timeline"].includes(initial)){
+  showPage(initial);
+} else {
+  showPage("home");
+}
+
+/** Motion helpers */
+function applyReveal(root){
+  root.querySelectorAll(".reveal").forEach(el => el.classList.remove("reveal"));
+  const targets = root.querySelectorAll(".hero, .card, .item, .skill");
+  targets.forEach((el, i) => {
+    el.style.setProperty("--d", `${Math.min(i*55, 420)}ms`);
+    requestAnimationFrame(()=> el.classList.add("reveal"));
+  });
+}
+function animateSkills(root){
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fills = root.querySelectorAll(".fill[data-pct]");
+  if(!fills.length) return;
+
+  fills.forEach((f, i) => {
+    const pct = Number(f.dataset.pct || 0);
+    if(reduce){
+      f.style.width = `${pct}%`;
+      return;
+    }
+    f.style.width = "0%";
+    const delay = Math.min(i*60, 480);
+    setTimeout(()=> requestAnimationFrame(()=> { f.style.width = `${pct}%`; }), delay);
+  });
+}
+function markSpotlight(){
+  const items = document.querySelectorAll("#summaryList .item");
+  items.forEach(it => {
+    const t = it.querySelector(".title")?.textContent?.trim() || "";
+    if(t.includes("主打方向") || t.includes("主業")){
+      it.classList.add("spotlight");
+    }
+  });
+}
+
+/** Helpers */
+function renderSkills(arr){
+  return arr.map(s => {
+    const pct = clamp(s.level,0,100);
+    return `
+      <div class="skill">
+        <div class="row">
+          <div class="k">${escapeHtml(s.name)}</div>
+          <div class="v">${pct}%</div>
+        </div>
+        <div class="bar"><div class="fill" data-pct="${pct}" style="width:0%"></div></div>
+      </div>
+    `;
+  }).join("");
+}
+function itemHTML(title, meta, desc){
+  return `
+    <div class="item">
+      <div class="top">
+        <h3 class="title">${escapeHtml(title)}</h3>
+        <div class="meta">${escapeHtml(meta || "")}</div>
+      </div>
+      <div class="desc">${escapeHtml(desc || "")}</div>
+    </div>
+  `;
+}
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function escapeAttr(s){ return escapeHtml(s).replaceAll("`","&#096;"); }
+function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+
+/** =========================
+ *  Extra FX: 粒子 + 聚光 + 3D Tilt
+ * ========================= */
+(function initFx(){
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const body = document.body;
+  // 即使使用者開了「減少動態」，也保留互動光暈與靜態粒子
+  body.classList.add("fx");
+
+  // Debug badge (auto-hide)
+  const dbg = document.getElementById("fxDebug");
+  if(dbg){
+    const update = (e)=>{
+      const accent = document.documentElement.getAttribute("data-accent");
+      const mx = e ? `${Math.round(e.clientX)},${Math.round(e.clientY)}` : "-";
+      dbg.textContent = `FX: ON\naccent: ${accent}\nreduce-motion: ${reduce ? "ON" : "OFF"}\nmouse: ${mx}\n(按任意鍵可再顯示)`;
+    };
+    dbg.classList.add("show");
+    update(null);
+    setTimeout(()=>dbg.classList.remove("show"), 12000);
+    window.addEventListener("pointermove", (e)=>update(e), {passive:true});
+    window.addEventListener("keydown", ()=>{
+      dbg.classList.add("show");
+      setTimeout(()=>dbg.classList.remove("show"), 4000);
+    }, {passive:true});
+  }
+
+// --- cursor spotlight vars
+  function setSpot(e){
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    document.documentElement.style.setProperty("--mx", x.toFixed(2) + "%");
+    document.documentElement.style.setProperty("--my", y.toFixed(2) + "%");
+  }
+  window.addEventListener("pointermove", setSpot, {passive:true});
+
+  // --- tilt effect (cards/items/hero/skills)
+  const tilts = Array.from(document.querySelectorAll(".card, .item, .hero, .skill"));
+  tilts.forEach(el => {
+    el.classList.add("tiltFx","fxBorder");
+    el.addEventListener("pointermove", (e)=>{
+      if(reduce) return;
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rx = (0.5 - py) * 10;  // deg
+      const ry = (px - 0.5) * 12;  // deg
+      el.style.setProperty("--rx", rx.toFixed(2) + "deg");
+      el.style.setProperty("--ry", ry.toFixed(2) + "deg");
+      el.style.setProperty("--px", (px*100).toFixed(2) + "%");
+      el.style.setProperty("--py", (py*100).toFixed(2) + "%");
+    }, {passive:true});
+
+    el.addEventListener("pointerleave", ()=>{
+      el.style.setProperty("--rx","0deg");
+      el.style.setProperty("--ry","0deg");
+      el.style.setProperty("--px","50%");
+      el.style.setProperty("--py","35%");
+    });
+  });
+
+  // --- particle canvas
+  const canvas = document.getElementById("fxCanvas");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d", {alpha:true});
+  let W=0,H=0, DPR=1;
+
+  function readAccent(){
+    const cs = getComputedStyle(document.documentElement);
+    const a1 = cs.getPropertyValue("--accent-1").trim() || "#7c3aed";
+    const a2 = cs.getPropertyValue("--accent-2").trim() || "#06b6d4";
+    const a3 = cs.getPropertyValue("--accent-3").trim() || "#f97316";
+    const ink = cs.getPropertyValue("--text").trim() || "#111827";
+    return {a1,a2,a3,ink};
+  }
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth = window.innerWidth;
+    H = canvas.clientHeight = window.innerHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener("resize", resize, {passive:true});
+  resize();
+
+  const N = Math.max(60, Math.min(120, Math.floor((W*H) / 18000)));
+  const parts = [];
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+
+  function spawn(){
+    const {a1,a2,a3,ink} = readAccent();
+    const isColor = document.documentElement.getAttribute("data-accent") === "color";
+    const palette = isColor ? [a1,a2,a3] : [ink];
+    parts.length = 0;
+    for(let i=0;i<N;i++){
+      parts.push({
+        x:rnd(0,W), y:rnd(0,H),
+        vx:rnd(-0.18,0.18), vy:rnd(-0.12,0.12),
+        r:rnd(1.6, 3.6),
+        a:rnd(0.14, 0.28),
+        c: palette[Math.floor(Math.random()*palette.length)]
+      });
+    }
+  }
+  spawn();
+
+  // re-pick colors when accent toggles
+  const _setAccent = window.setAccent;
+  if(typeof _setAccent === "function"){
+    window.setAccent = function(a){
+      _setAccent(a);
+      spawn();
+    }
+  }
+
+  let t=0;
+  function tick(){
+    t += 1;
+    const isColor = document.documentElement.getAttribute("data-accent") === "color";
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation = isColor ? "lighter" : "source-over";
+
+    // connect lines (very light)
+    const linkDist = isColor ? 140 : 110;
+    ctx.lineWidth = 1;
+
+    for(let i=0;i<parts.length;i++){
+      for(let j=i+1;j<parts.length;j++){
+        const a = parts[i], b = parts[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d2 = dx*dx + dy*dy;
+        if(d2 < linkDist*linkDist){
+          const d = Math.sqrt(d2);
+          const alpha = (1 - d / linkDist) * (isColor ? 0.10 : 0.06);
+          ctx.globalAlpha = alpha;
+          ctx.strokeStyle = a.c;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    for(const p of parts){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < -10) p.x = W+10;
+      if(p.x > W+10) p.x = -10;
+      if(p.y < -10) p.y = H+10;
+      if(p.y > H+10) p.y = -10;
+
+      // gentle drift
+      const wob = Math.sin((t + p.x)*0.002) * 0.08;
+      const wob2= Math.cos((t + p.y)*0.0022) * 0.06;
+
+      ctx.beginPath();
+      ctx.fillStyle = p.c;
+      ctx.globalAlpha = p.a;
+      ctx.arc(p.x + wob, p.y + wob2, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if(!reduce) requestAnimationFrame(tick);
+  }
+  // reduce-motion：只畫一張（靜態），不持續跑動畫
+  if(!reduce) requestAnimationFrame(tick);
+  else tick();
+})();
+
+/** =========================
+ *  Tabs: 離場更順
+ * ========================= */
+(function patchTabsForSmoothOut(){
+  const _showPage = window.showPage;
+  if(typeof _showPage !== "function") return;
+
+  window.showPage = function(key){
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const current = document.querySelector(".page.active");
+    const target = document.querySelector(`#page-${key}`);
+    if(!target){ return _showPage(key); }
+    if(reduce || !current || current === target){
+      return _showPage(key);
+    }
+
+    // Start leaving animation
+    current.classList.add("leaving");
+    // wait a bit then switch
+    setTimeout(()=>{
+      current.classList.remove("active","leaving");
+      document.querySelectorAll(".page").forEach(p => p !== target && p.classList.remove("active"));
+      target.classList.add("active");
+
+      // tabs active
+      document.querySelectorAll(".tabBtn").forEach(b => b.classList.toggle("active", b.dataset.page === key));
+      location.hash = key;
+
+      window.scrollTo({top: 0, behavior: "smooth"});
+
+      // re-animate
+      applyReveal(target);
+      animateSkills(target);
+    }, 170);
+  }
+})();
+
+/** =========================
+ *  Desk Pet: drag / poke / snap / toggle
+ * ========================= */
+(function initDeskPet(){
+  const pet = document.getElementById("deskPet");
+  if(!pet) return;
+
+  // Restore position
+  const saved = localStorage.getItem("deskPetPos");
+  if(saved){
+    try{
+      const {x,y} = JSON.parse(saved);
+      if(typeof x === "number" && typeof y === "number"){
+        pet.style.left = x + "px";
+        pet.style.top = y + "px";
+        pet.style.right = "auto";
+        pet.style.bottom = "auto";
+      }
+    }catch{}
+  }
+
+  let dragging = false;
+  // --- autonomous movement (gentle patrol)
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let autoOn = !reduceMotion;
+  let vx = (Math.random() < 0.5 ? -1 : 1) * (0.32 + Math.random()*0.22);
+  let vy = (Math.random() < 0.5 ? -1 : 1) * (0.26 + Math.random()*0.22);
+  let lastT = performance.now();
+
+  function ensureLeftTop(){
+    // If still using right/bottom, convert to left/top once
+    const st = getComputedStyle(pet);
+    if(st.left === "auto" || st.top === "auto"){
+      const r = pet.getBoundingClientRect();
+      pet.style.left = r.left + "px";
+      pet.style.top = r.top + "px";
+      pet.style.right = "auto";
+      pet.style.bottom = "auto";
+    }
+  }
+
+  function readXY(){
+    ensureLeftTop();
+    return {
+      x: parseFloat(pet.style.left || "0"),
+      y: parseFloat(pet.style.top || "0")
+    };
+  }
+
+  function autoTick(now){
+    const dt = Math.min(33, now - lastT); // cap step
+    lastT = now;
+
+    if(autoOn && !dragging){
+      const w = pet.offsetWidth;
+      const h = pet.offsetHeight;
+
+      const maxX = window.innerWidth - w - 6;
+      const maxY = window.innerHeight - h - 6;
+
+      const pos = readXY();
+      let x = pos.x + vx * dt * 0.9;
+      let y = pos.y + vy * dt * 0.9;
+
+      // bounce
+      if(x <= 6){ x = 6; vx = Math.abs(vx); }
+      if(x >= maxX){ x = maxX; vx = -Math.abs(vx); }
+      if(y <= 6){ y = 6; vy = Math.abs(vy); }
+      if(y >= maxY){ y = maxY; vy = -Math.abs(vy); }
+
+      // tiny random drift
+      if(Math.random() < 0.015){
+        vx += (Math.random()-0.5) * 0.06;
+        vy += (Math.random()-0.5) * 0.06;
+        // clamp speed
+        vx = Math.max(-0.9, Math.min(0.9, vx));
+        vy = Math.max(-0.9, Math.min(0.9, vy));
+      }
+
+      pet.style.left = x + "px";
+      pet.style.top = y + "px";
+
+      // persist every ~2s
+      if(now % 2000 < dt){
+        localStorage.setItem("deskPetPos", JSON.stringify({x:Math.round(x), y:Math.round(y)}));
+      }
+    }
+    requestAnimationFrame(autoTick);
+  }
+  requestAnimationFrame(autoTick);
+
+
+  // press "P" to pause/resume auto move
+  window.addEventListener("keydown", (e)=>{
+    if(e.key && (e.key === "p" || e.key === "P")){
+      autoOn = !autoOn;
+      pet.classList.remove("poke");
+      void pet.offsetWidth;
+      pet.classList.add("poke");
+      const dbg = document.getElementById("fxDebug");
+      if(dbg){ dbg.classList.add("show"); setTimeout(()=>dbg.classList.remove("show"), 1800); }
+    }
+  }, {passive:true});
+
+
+  let startX=0, startY=0, baseX=0, baseY=0;
+  let clickLock = false;
+
+  function getPos(){
+    const r = pet.getBoundingClientRect();
+    return {x:r.left, y:r.top};
+  }
+
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+  function onDown(e){
+    dragging = true;
+    clickLock = false;
+    pet.classList.remove("snap");
+    pet.setPointerCapture?.(e.pointerId);
+    const p = getPos();
+    startX = e.clientX; startY = e.clientY;
+    baseX = p.x; baseY = p.y;
+    // ensure positioned by left/top
+    pet.style.left = baseX + "px";
+    pet.style.top = baseY + "px";
+    pet.style.right = "auto";
+    pet.style.bottom = "auto";
+    // prevent text selection and stop page dragging
+    e.preventDefault();
+  }
+
+  function onMove(e){
+    if(!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if(Math.abs(dx)+Math.abs(dy) > 3) clickLock = true;
+
+    const w = pet.offsetWidth;
+    const h = pet.offsetHeight;
+    const nx = clamp(baseX + dx, 6, window.innerWidth - w - 6);
+    const ny = clamp(baseY + dy, 6, window.innerHeight - h - 6);
+    pet.style.left = nx + "px";
+    pet.style.top = ny + "px";
+  }
+
+  function onUp(e){
+    if(!dragging) return;
+    dragging = false;
+    pet.releasePointerCapture?.(e.pointerId);
+    const p = getPos();
+    localStorage.setItem("deskPetPos", JSON.stringify({x:Math.round(p.x), y:Math.round(p.y)}));
+    // snap animation
+    pet.classList.add("snap");
+  }
+
+  pet.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove, {passive:false});
+  window.addEventListener("pointerup", onUp);
+
+  // click: poke
+  pet.addEventListener("click", ()=>{
+    if(clickLock) return;
+    pet.classList.remove("poke");
+    // reflow
+    void pet.offsetWidth;
+    pet.classList.add("poke");
+  });
+
+  // double click: toggle accent (mono <-> color)
+  pet.addEventListener("dblclick", ()=>{
+    const current = document.documentElement.getAttribute("data-accent") || "mono";
+    const next = current === "mono" ? "color" : "mono";
+    if(typeof window.setAccent === "function") window.setAccent(next);
+    else {
+      document.documentElement.setAttribute("data-accent", next);
+      localStorage.setItem("accent", next);
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
