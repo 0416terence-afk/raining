@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>r41n1ng // NEURAL ACCESS</title>
+  <style>
+    :root {
+      --neon-green: #00ff9d;
+      --neon-purple: #c300ff;
+      --neon-blue: #00d0ff;
+      --neon-pink: #ff00aa;
+      --bg: #010101;
+      --text: #e0e0e0;
+      --muted: #888;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      overflow-x: hidden;
+    }
+
+    /* 二進位雨 */
+    #binary-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.12;
+      overflow: hidden;
+    }
+    .binary {
+      position: absolute;
+      color: var(--neon-green);
+      font-size: 13px;
+      font-family: monospace;
+      white-space: pre;
+      opacity: 0.65;
+      animation: fall linear infinite;
+      text-shadow: 0 0 8px var(--neon-green);
+    }
+    @keyframes fall { to { transform: translateY(100vh); } }
+
+    .scanline {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(transparent 50%, rgba(0,255,157,0.06) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      animation: scan 9s linear infinite;
+      z-index: 9999;
+      opacity: 0.07;
+    }
+    @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+
+    /* 自訂游標（預設隱藏，手機上完全不顯示） */
+    #custom-cursor {
+      position: fixed;
+      width: 24px; height: 24px;
+      border: 2px solid var(--neon-purple);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      mix-blend-mode: difference;
+      box-shadow: 0 0 25px var(--neon-purple);
+      transition: transform 0.1s ease;
+      display: none;
+    }
+
+    .trail {
+      position: fixed;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      box-shadow: 0 0 20px currentColor;
+      opacity: 0.85;
+      transition: all 0.6s ease-out;
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(1,1,1,0.98);
+      border-bottom: 2px solid var(--neon-green);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,255,157,0.35);
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+      color: var(--neon-green);
+      text-shadow: 0 0 18px var(--neon-green);
+      letter-spacing: 5px;
+    }
+
+    .nav-toggle {
+      font-size: 30px;
+      color: var(--neon-green);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    nav {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(1,1,1,0.98);
+      border-bottom: 1px solid var(--neon-green);
+      display: none;
+      flex-direction: column;
+      z-index: 99;
+    }
+    nav.active { display: flex; }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 17px;
+      padding: 18px 30px;
+      border-bottom: 1px dashed rgba(0,255,157,0.25);
+    }
+    nav a:last-child { border-bottom: none; }
+    nav a:hover, nav a.active {
+      color: var(--neon-green);
+      background: rgba(0,255,157,0.08);
+    }
+
+    main {
+      margin-top: 80px;
+      padding: 30px 20px 100px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.8s ease forwards; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+
+    .hero {
+      text-align: center;
+      padding: 110px 20px 80px;
+      border: 1px solid var(--neon-green);
+      margin-bottom: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .typewriter {
+      font-size: 46px;
+      color: var(--neon-green);
+      text-shadow: 0 0 35px var(--neon-green);
+      letter-spacing: 6px;
+    }
+    .subtitle {
+      font-size: 19.5px;
+      color: var(--neon-blue);
+      text-shadow: 0 0 20px var(--neon-blue);
+      margin-top: 28px;
+      line-height: 1.55;
+      white-space: pre-line;
+    }
+
+    h2 {
+      color: var(--neon-purple);
+      font-size: 25px;
+      margin: 55px 0 28px;
+      border-bottom: 1px dashed var(--neon-purple);
+      padding-bottom: 12px;
+    }
+
+    .card {
+      background: rgba(20,20,35,0.9);
+      border: 1px solid var(--neon-green);
+      padding: 28px 24px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 30px rgba(0,255,157,0.35);
+      transition: all 0.4s ease;
+    }
+    .card:hover {
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 50px rgba(195,0,255,0.6);
+      transform: translateY(-6px);
+    }
+
+    .item { padding: 24px 0; border-bottom: 1px dashed rgba(0,255,157,0.3); }
+    .item:last-child { border-bottom: none; }
+    .title { color: var(--neon-green); font-size: 19.5px; margin-bottom: 9px; }
+    .meta { color: var(--muted); font-size: 14.5px; }
+    .desc { margin-top: 13px; color: #ddd; line-height: 1.75; font-size: 15.5px; }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+    .skill {
+      background: rgba(20,20,35,0.85);
+      border: 1px solid var(--neon-blue);
+      padding: 26px;
+    }
+    .bar {
+      height: 12px;
+      background: #1a1a1a;
+      border: 1px solid var(--neon-blue);
+      margin-top: 18px;
+    }
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-purple), var(--neon-blue));
+    }
+
+    footer {
+      text-align: center;
+      padding: 70px 20px 50px;
+      color: var(--muted);
+      font-size: 13.5px;
+      border-top: 1px dashed var(--neon-green);
+    }
+
+    /* ==================== 桌面 / 平板版 ==================== */
+    @media (min-width: 768px) {
+      .typewriter { font-size: 68px; letter-spacing: 9px; }
+      .subtitle { font-size: 24px; }
+
+      header {
+        height: 72px;
+        justify-content: center;
+        gap: 60px;
+        padding: 0 40px;
+      }
+      .logo {
+        position: absolute;
+        left: 50px;
+        font-size: 27px;
+      }
+      .nav-toggle { display: none; }
+
+      nav {
+        position: static;
+        display: flex;
+        flex-direction: row;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+      nav a {
+        padding: 12px 26px;
+        border-bottom: none;
+        font-size: 16px;
+      }
+
+      main {
+        margin-top: 90px;
+        padding: 40px 60px 120px;
+        max-width: 1080px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero { padding: 160px 40px 110px; }
+      .skills-grid { grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 28px; }
+
+      #custom-cursor { display: block; } /* 桌面顯示自訂游標 */
+    }
+
+    @media (min-width: 1024px) {
+      .typewriter { font-size: 78px; letter-spacing: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="binary-bg"></div>
+<div class="scanline"></div>
+<div id="custom-cursor"></div>
+
+<header>
+  <div class="logo">r41n1ng</div>
+  <button class="nav-toggle" id="nav-toggle">☰</button>
+  
+  <nav id="main-nav">
+    <a href="#" class="nav-link active" data-page="home">STATUS</a>
+    <a href="#" class="nav-link" data-page="resume">EXPERIENCE</a>
+    <a href="#" class="nav-link" data-page="projects">EXPLOITS</a>
+    <a href="#" class="nav-link" data-page="timeline">PATH</a>
+  </nav>
+</header>
+
+<main>
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="typewriter glitch" id="type-title"></div>
+      <p class="subtitle" id="type-subtitle"></p>
+    </div>
+
+    <h2>CORE DIRECTIVE</h2>
+    <div class="card">
+      <div class="item">
+        <div class="title">主打方向</div>
+        <div class="meta">reverse engineer / CTF</div>
+        <div class="desc">偏好炸電腦與漏洞挖掘，正在與 Reverse 苦戰中</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUME -->
+  <div id="page-resume" class="page">
+    <h2>EXPERIENCE LOG</h2>
+    <div class="card" id="resume-content"></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div id="page-projects" class="page">
+    <h2>NOTES &amp; EXPLOITS</h2>
+    <div class="card" id="projects-content"></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="page-timeline" class="page">
+    <h2>LEARNING PATH</h2>
+    <div class="card" id="timeline-content"></div>
+    
+    <h2>EXTERNAL NODES</h2>
+    <div class="card" id="links-content"></div>
+  </div>
+</main>
+
+<footer>
+  © 2026 r41n1ng • NEURAL INTERFACE v1.0 • CONNECTION STABLE
+</footer>
+
+<script>
+// ==================== 資料 ====================
+const PROFILE = {
+  resume: [
+    { title: "picoCTF", meta: "2025", desc: "", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/SyxJXFWObx" },
+    { title: "picoCTF 2026", meta: "2026", desc: "", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/B1QlirWcZx" },
+    { title: "TSCCTF", meta: "2026", desc: "", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/HyVbu0A_Zx" },
+    { title: "THJCC", meta: "2026", desc: "", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/rJ_L8O8d-x" },
+    { title: "Fhctf", meta: "2025", desc: "忘寫WP，只有學到凱薩加密和簡單的 XOR", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/rJOxZ_wVWe" },
+    { title: "ASIS CTF", meta: "2025", desc: "第一次參加 CTF，還不太會打，主要是熟悉環境和工具，沒WP", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/r1IBRQCX-x" }
+  ],
+
+  projects: [
+    { title: "Linux 基礎筆記", meta: "2025", desc: "常用指令、權限提升、常見服務配置整理。", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/BJnbfx3nex" },
+    { title: "Reverse 入門筆記", meta: "2025", desc: "常見逆向技巧、工具使用與簡單動態分析。", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/Hklq0_Fbbl" },
+    { title: "Web bas", meta: "2025", desc: "Web 漏洞整理。", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/SyB1mjPAxg" },
+    { title: "Web adv", meta: "2025", desc: "more WRB", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/HyVQpdTWWl" },
+    { title: "Pwn 筆記", meta: "2026", desc: "根本算沒寫", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/BJnbfx3nex" },
+    { title: "BLteam", meta: "2026", desc: "volatility 分析", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/SyNij6Iwbx" },
+    { title: "賽前突然嚇到尖叫", meta: "2026", desc: "賽前重點筆記", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/HJaqeOAcWg" }
+  ],
+
+  timeline: [
+    { title: "2026網路安全分區小作文", meta: "", desc: "哈，分區打不出來", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/S1RhNPUsbx" }
+  ],
+
+  links: [
+    { title: "GitHub", desc: "程式碼、小工具與解題腳本", url: "https://github.com/" },
+    { title: "HackMD 筆記總集", desc: "資安學習記錄", url: "https://hackmd.io/@VMMN30ECT5CKLjFl7pA8pA/HJOOqBmlZl" },
+    { title: "Instagram", desc: "@416_ctn", url: "https://instagram.com/416_ctn" }
+  ],
+
+  skills: [
+    { name: "Cybersecurity", level: 67 },
+    { name: "CTF", level: 5 },
+    { name: "Reverse", level: 6 },
+    { name: "Pwn", level: 4 }
+  ]
+};
+
+// ==================== 渲染函式 ====================
+function renderSection(id, items) {
+  const container = document.getElementById(id);
+  container.innerHTML = items.map(item => `
+    <div class="item">
+      <div class="title">${item.title}</div>
+      ${item.meta ? `<div class="meta">${item.meta}</div>` : ''}
+      ${item.desc ? `<div class="desc">${item.desc}</div>` : ''}
+      ${item.url ? `<br><a href="${item.url}" target="_blank">→ ACCESS NODE</a>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderSkills() {
+  const home = document.getElementById('page-home');
+  const html = `
+    <h2>SKILL MATRIX</h2>
+    <div class="skills-grid">
+      ${PROFILE.skills.map(s => `
+        <div class="skill">
+          <div style="display:flex;justify-content:space-between;color:var(--neon-blue);font-size:17px;">
+            <span>${s.name}</span><span>${s.level}%</span>
+          </div>
+          <div class="bar"><div class="fill" style="width:${s.level}%"></div></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  home.innerHTML += html;
+}
+
+// ==================== 二進位雨 ====================
+function createBinaryRain() {
+  const bg = document.getElementById('binary-bg');
+  bg.innerHTML = ''; // 清空避免重複
+  for (let i = 0; i < 120; i++) {
+    const binary = document.createElement('div');
+    binary.className = 'binary';
+    const patterns = ['101001', '010110', '110010', '001101', '111000', '000111'];
+    binary.textContent = patterns[Math.floor(Math.random() * patterns.length)];
+    binary.style.left = Math.random() * 100 + 'vw';
+    binary.style.top = '-' + Math.random() * 100 + 'vh';
+    binary.style.animationDuration = (Math.random() * 8 + 3) + 's';
+    binary.style.fontSize = (Math.random() * 9 + 12) + 'px';
+    bg.appendChild(binary);
+  }
+}
+
+// ==================== 手機 / 電腦判斷 ====================
+function isMobileDevice() {
+  if (navigator.userAgentData && navigator.userAgentData.mobile !== undefined) {
+    return navigator.userAgentData.mobile;
+  }
+  const isSmall = window.innerWidth < 768;
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 1;
+  const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  return isSmall || (hasTouch && mobileUA);
+}
+
+// ==================== 初始化 ====================
+createBinaryRain();
+renderSection('resume-content', PROFILE.resume);
+renderSection('projects-content', PROFILE.projects);
+renderSection('timeline-content', PROFILE.timeline);
+renderSection('links-content', PROFILE.links);
+renderSkills();
+
+// 頁面切換 + 漢堡選單
+const navToggle = document.getElementById('nav-toggle');
+const mainNav = document.getElementById('main-nav');
+
+navToggle.addEventListener('click', () => {
+  mainNav.classList.toggle('active');
+  navToggle.textContent = mainNav.classList.contains('active') ? '✕' : '☰';
+});
+
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${link.dataset.page}`).classList.add('active');
+
+    // 手機上點擊後自動收起選單
+    if (isMobileDevice()) {
+      mainNav.classList.remove('active');
+      navToggle.textContent = '☰';
+    }
+  });
+});
+
+// 打字機效果
+function humanTypeWriter(element, text, baseSpeed = 50, callback) {
+  let i = 0;
+  element.textContent = '';
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      let delay = baseSpeed + Math.random() * 35;
+      if ('。，\n'.includes(text.charAt(i-1))) delay += 180;
+      if (Math.random() < 0.08) delay += 120;
+      setTimeout(type, delay);
+    } else if (callback) callback();
+  }
+  type();
+}
+
+window.addEventListener('load', () => {
+  const isMobile = isMobileDevice();
+  console.log(isMobile ? '📱 目前為手機模式' : '💻 目前為電腦模式');
+
+  const titleEl = document.getElementById('type-title');
+  const subtitleEl = document.getElementById('type-subtitle');
+  
+  humanTypeWriter(titleEl, "r41n1ng", 75, () => {
+    subtitleEl.style.opacity = "1";
+    humanTypeWriter(subtitleEl, "資安學習者 • cybersecurity • CTF\n賽德克族 • 正在與 Reverse 持續戰鬥", 42);
+  });
+
+  // 電腦才啟用自訂游標與拖尾
+  if (!isMobile) {
+    const cursor = document.getElementById('custom-cursor');
+    const trailColors = ['#c300ff', '#00d0ff', '#00ff9d', '#ff00aa', '#9d00ff'];
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+
+      for (let i = 0; i < 3; i++) {
+        const trail = document.createElement('div');
+        trail.className = 'trail';
+        const offsetX = (Math.random() - 0.5) * 14;
+        const offsetY = (Math.random() - 0.5) * 14;
+        
+        trail.style.left = `${e.clientX + offsetX}px`;
+        trail.style.top = `${e.clientY + offsetY}px`;
+        trail.style.background = trailColors[Math.floor(Math.random() * trailColors.length)];
+        trail.style.width = `${10 + Math.random() * 10}px`;
+        trail.style.height = trail.style.width;
+        
+        document.body.appendChild(trail);
+
+        setTimeout(() => {
+          trail.style.opacity = '0';
+          trail.style.transform = `scale(0.1) translate(${offsetX*2.5}px, ${offsetY*2.5}px)`;
+        }, 100 + i * 40);
+
+        setTimeout(() => trail.remove(), 1400);
+      }
+    });
+
+    document.addEventListener('click', () => {
+      cursor.style.transform = 'scale(3)';
+      setTimeout(() => cursor.style.transform = 'scale(1)', 300);
+    });
+  }
+});
+</script>
+</body>
+</html>
